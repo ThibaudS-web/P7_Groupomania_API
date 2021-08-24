@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const rateLimit = require("express-rate-limit")
 const app = express()
 
@@ -7,6 +8,10 @@ const limiter = rateLimit({
   windowMs: 1000,  // 1 second
   max: 10 // limit each IP to 10 requests per seconds
 });
+
+//Body Parser configuration
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 //Setup headers
 app.use((req, res, next) =>   {
