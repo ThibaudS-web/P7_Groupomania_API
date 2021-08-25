@@ -1,6 +1,8 @@
+const { Sequelize, DataTypes } = require("sequelize");
 const express = require('express')
 const bodyParser = require('body-parser')
 const rateLimit = require("express-rate-limit")
+
 const app = express()
 
 //Limit request : 10 per sec
@@ -9,9 +11,22 @@ const limiter = rateLimit({
   max: 10 // limit each IP to 10 requests per seconds
 });
 
-//Body Parser configuration
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
+//import routes
+const userRoutes = require('./routes/user')
+
+//Connexion at the database "groupomaniadb_development"
+const sequelize = new Sequelize("groupomaniadb_development", "root", "", {
+  host: "localhost",
+  dialect: "mysql"
+});
+
+//Test the connexion at the Database
+try {
+  sequelize.authenticate();
+  console.log('Connection has been established successfully.');
+} catch (error) {
+  console.error('Unable to connect to the database:', error);
+}
 
 //Setup headers
 app.use((req, res, next) =>   {
@@ -21,6 +36,12 @@ app.use((req, res, next) =>   {
     next()
   })
 
+//Body Parser configuration
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
+app.use('api/auth', userRoutes)
+
+app.use(limiter)
 
 module.exports = app
