@@ -21,8 +21,7 @@ exports.signup = async (req, res, next) => {
 
     //Return an error if password, email or username is an empty field
     if(password == undefined || email == undefined || username == undefined) {
-        return res.status(400).json({ error: 'required fields : password, email, username' })
-        
+        return res.status(400).json({ error: 'required fields : password, email, username' })   
     }
 
     //Return an error if the username length is not between 3 and 12 characters
@@ -66,6 +65,38 @@ exports.signup = async (req, res, next) => {
     }
 }
 
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
 
+    //Body request
+    let email    = req.body.email;
+    let password = req.body.password;
+
+    //Return an error if password, email or username is an empty field
+    if(password == undefined || email == undefined) {
+        return res.status(400).json({ error: 'required fields : password, email' })   
+    }
+    
+    const user = await models.User.findOne({
+        where: {email: email}
+    })
+
+    if(user) {
+        bcrypt.compare(password, user.password)
+        .then(valid => {
+            if(!valid) {
+                return res.status(401).json({ message:'Wrong password !'})
+            }
+            const tokenUser = {
+                userId: user.id,
+                token: jwt.sign(
+                    { userId: user.id },
+                    `${process.env.TOKENPASS}`,
+                    { expiresIn: '24h'}                            
+                )
+            }
+            res.status(200).json(tokenUser)    
+        })
+    } else {
+        return res.status(401).json({ message:'User not found !'})
+    }
 }

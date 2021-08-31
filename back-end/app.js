@@ -13,6 +13,7 @@ const limiter = rateLimit({
 
 //import routes
 const userRoutes = require('./routes/user')
+const messageRoutes = require('./routes/message')
 
 //Connexion at the database "groupomaniadb_development"
 const sequelize = new Sequelize("groupomaniadb_development", "root", "", {
@@ -43,6 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 app.use('/api/auth', userRoutes)
+// app.use('/api/messages', messageRoutes)
 
 app.use(limiter)
 
