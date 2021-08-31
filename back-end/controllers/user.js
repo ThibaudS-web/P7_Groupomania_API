@@ -36,7 +36,7 @@ exports.signup = async (req, res, next) => {
 
     //Testing password regexp
     if(!passwordTest) {
-        return res.status(400).json({ error : "Invalid password : The password should be between 4 and 8 characters and must be include one number at least"})
+        return res.status(400).json({ error : "Invalid password : The password should be between 4 and 8 characters and must be include one number at least"}) //add MaJ
     }
 
     //Searching in database if email user already exist
@@ -84,7 +84,7 @@ exports.login = async (req, res, next) => {
         bcrypt.compare(password, user.password)
         .then(valid => {
             if(!valid) {
-                return res.status(401).json({ message:'Wrong password !'})
+                return res.status(401).json({ message:'Wrong credentials !'})
             }
             const tokenUser = {
                 userId: user.id,
@@ -100,3 +100,5 @@ exports.login = async (req, res, next) => {
         return res.status(401).json({ message:'User not found !'})
     }
 }
+
+//validation data node 

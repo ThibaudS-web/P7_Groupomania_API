@@ -16,15 +16,18 @@ const userRoutes = require('./routes/user')
 const messageRoutes = require('./routes/message')
 
 //Connexion at the database "groupomaniadb_development"
-const sequelize = new Sequelize("groupomaniadb_development", "root", "", {
-  host: "localhost",
-  dialect: "mysql",
-});
-
+// const sequelize = new Sequelize("groupomaniadb_development", "root", "", {
+//   host: "localhost",
+//   dialect: "mysql",
+// });
+const db = require('./models/index')
+const user = require('./models/user')
+const message = require('./models/message')
 //Test the connexion at the Database
 try {
-  sequelize.authenticate();
+  db.sequelize.authenticate();
   console.log('Connection has been established successfully');
+  db.sequelize.sync()
 } catch (error) {
   console.error('Unable to connect to the database:', error);
 }
@@ -44,7 +47,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 app.use('/api/auth', userRoutes)
-// app.use('/api/messages', messageRoutes)
+app.use('/api/messages', messageRoutes)
 
 app.use(limiter)
 
