@@ -2,7 +2,8 @@
 
 var jwt = require('jsonwebtoken');
 
-var models = require('../models');
+var models = require('../models'); //Create a message
+
 
 exports.createMessage = function (req, res, next) {
   //body request
@@ -16,42 +17,39 @@ exports.createMessage = function (req, res, next) {
     title: title,
     content: content
   };
-  models.Message.create(newMessage).then(function () {
-    return res.status(201).json({
-      message: 'Message created !'
+
+  try {
+    models.Message.create(newMessage).then(function () {
+      return res.status(201).json({
+        message: 'Message created !'
+      });
+    })["catch"](function (error) {
+      return res.status(400).json({
+        error: error
+      });
     });
-  })["catch"](function (error) {
-    return res.status(400).json({
+  } catch (error) {
+    res.status(500).json({
       error: error
     });
-  });
+  }
+}; //Find all Messages
+
+
+exports.getAllMessages = function (req, res, next) {
+  try {
+    models.Message.findAll().then(function (messages) {
+      return res.status(200).json({
+        messages: messages
+      });
+    })["catch"](function (error) {
+      return res.status(400).json({
+        error: error
+      });
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error
+    });
+  }
 };
-
-exports.getAllMessages = function _callee(req, res, next) {
-  var messages, readAllMessage;
-  return regeneratorRuntime.async(function _callee$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          _context.next = 2;
-          return regeneratorRuntime.awrap(models.Message.findAll());
-
-        case 2:
-          messages = _context.sent;
-          readAllMessage = messages.every(function (messages) {
-            return messages instanceof Message;
-          });
-          res.status(200).json({
-            readAllMessage: readAllMessage
-          });
-
-        case 5:
-        case "end":
-          return _context.stop();
-      }
-    }
-  });
-}; // // Find all users
-// const users = await User.findAll();
-// console.log(users.every(user => user instanceof User)); // true
-// console.log("All users:", JSON.stringify(users, null, 2));

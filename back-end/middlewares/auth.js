@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 //Middleware to require user authentication
-module.exports = (req, res, next) => {
+module.exports  =  (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1]
         const decodedToken = jwt.verify(token, `${process.env.TOKENPASS}`) //In params, the token and the secret key
@@ -9,7 +9,6 @@ module.exports = (req, res, next) => {
         if(req.body.userId && req.body.userId !== userId){
             throw 'User ID not valid !'
         } else {
-            //req.body.userId 
             next()
         }
     } catch ( error ) {

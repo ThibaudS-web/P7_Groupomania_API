@@ -2,9 +2,8 @@ const jwt = require('jsonwebtoken')
 var models  = require('../models')
 
 
-
+//Create a message
 exports.createMessage = (req, res, next) => {
-
     //body request
     
     const title = req.body.title
@@ -19,23 +18,25 @@ exports.createMessage = (req, res, next) => {
         content: content,
     }
 
-    models.Message.create(newMessage)
-    .then(() => res.status(201).json({ message: 'Message created !'}))
-    .catch((error) => res.status(400).json({ error }))
+    try {
+        models.Message.create(newMessage)
+        .then(() => res.status(201).json({ message: 'Message created !'}))
+        .catch((error) => res.status(400).json({ error }))
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+}
+
+
+//Find all Messages
+exports.getAllMessages =   (req, res, next) => {
     
-}
-
-
-
-exports.getAllMessages = async  (req, res, next) => {
-
-    const messages = await models.Message.findAll()
-    const readAllMessage = messages.every(messages => messages instanceof Message)
-    res.status(200).json({readAllMessage})
-
+        try{
+            models.Message.findAll()
+            .then((messages) => res.status(200).json({ messages }))
+            .catch((error) => res.status(400).json({ error }))
+        } catch (error) {
+            res.status(500).json({ error })
+        }
 
 }
-// // Find all users
-// const users = await User.findAll();
-// console.log(users.every(user => user instanceof User)); // true
-// console.log("All users:", JSON.stringify(users, null, 2));
