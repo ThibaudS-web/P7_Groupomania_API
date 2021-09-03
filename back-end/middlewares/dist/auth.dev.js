@@ -13,6 +13,7 @@ module.exports = function (req, res, next) {
     if (req.body.userId && req.body.userId !== userId) {
       throw 'User ID not valid !';
     } else {
+      req.body.userId = userId;
       next();
     }
   } catch (error) {

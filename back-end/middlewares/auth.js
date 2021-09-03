@@ -9,7 +9,9 @@ module.exports  =  (req, res, next) => {
         if(req.body.userId && req.body.userId !== userId){
             throw 'User ID not valid !'
         } else {
+            req.body.userId = userId
             next()
+            
         }
     } catch ( error ) {
         res.status(401).json({ error: error | 'Request unauthenticated !'})

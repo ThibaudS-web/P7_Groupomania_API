@@ -1,6 +1,7 @@
 //import bcrypt for hashing password in database 
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+
 //Import user model
 var models  = require('../models')
 
@@ -100,5 +101,17 @@ exports.login = async (req, res, next) => {
         return res.status(401).json({ message:'User not found !'})
     }
 }
+
+exports.getMyProfil = (req, res, next) => {
+
+    const userId = req.body.userId
+    
+    models.User.findOne({
+        attributes: ['id', 'bio', 'username', 'picture'],
+        where: { id: userId }
+    })
+    .then((myProfil) => res.status(200).json({ myProfil }))
+    .catch((error) => res.status(404).json({ error }))
+}   
 
 //validation data node 

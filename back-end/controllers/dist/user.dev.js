@@ -181,4 +181,22 @@ exports.login = function _callee2(req, res, next) {
       }
     }
   });
+};
+
+exports.getMyProfil = function (req, res, next) {
+  var userId = req.body.userId;
+  models.User.findOne({
+    attributes: ['id', 'bio', 'username', 'picture'],
+    where: {
+      id: userId
+    }
+  }).then(function (myProfil) {
+    return res.status(200).json({
+      myProfil: myProfil
+    });
+  })["catch"](function (error) {
+    return res.status(404).json({
+      error: error
+    });
+  });
 }; //validation data node

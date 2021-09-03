@@ -9,9 +9,10 @@ exports.createMessage = function (req, res, next) {
   //body request
   var title = req.body.title;
   var content = req.body.content;
-  var token = req.headers.authorization.split(' ')[1];
-  var decodedToken = jwt.decode(token);
-  var userId = decodedToken.userId;
+  var userId = req.body.userId; // const token = req.headers.authorization.split(' ')[1]
+  // const decodedToken = jwt.decode(token)
+  // const userId = decodedToken.userId
+
   var newMessage = {
     userId: userId,
     title: title,

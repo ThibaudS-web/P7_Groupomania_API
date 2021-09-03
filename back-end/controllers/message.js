@@ -2,15 +2,17 @@ const jwt = require('jsonwebtoken')
 var models  = require('../models')
 
 
+
 //Create a message
 exports.createMessage = (req, res, next) => {
     //body request
     
     const title = req.body.title
-    const content = req.body.content        
-    const token = req.headers.authorization.split(' ')[1]
-    const decodedToken = jwt.decode(token)
-    const userId = decodedToken.userId
+    const content = req.body.content    
+    const userId =  req.body.userId
+    // const token = req.headers.authorization.split(' ')[1]
+    // const decodedToken = jwt.decode(token)
+    // const userId = decodedToken.userId
 
     const newMessage = {
         userId: userId,
@@ -38,5 +40,4 @@ exports.getAllMessages =   (req, res, next) => {
         } catch (error) {
             res.status(500).json({ error })
         }
-
 }
