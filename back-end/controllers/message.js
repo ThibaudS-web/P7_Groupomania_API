@@ -10,9 +10,6 @@ exports.createMessage = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content    
     const userId =  req.body.userId
-    // const token = req.headers.authorization.split(' ')[1]
-    // const decodedToken = jwt.decode(token)
-    // const userId = decodedToken.userId
 
     const newMessage = {
         userId: userId,
@@ -29,6 +26,39 @@ exports.createMessage = (req, res, next) => {
     }
 }
 
+//Modify the user message 
+
+exports.modfifyMessageUser =  (req, res, next) => {
+    const userId =  req.body.userId
+
+    models.Message.findOne(
+        {
+            where: {id: req.params.id}
+        }
+    )
+    .then((message) => {
+        if(userId == message.userId) {
+            
+            try {
+                models.Message.update(
+                    {  
+                        content: req.body.content,
+                    },
+                    {where: {id: req.params.id}}             
+                )
+                .then((message) => res.status(201).json({ message, message : 'Message updated ! ' }))
+                .catch((error) => res.status(400).json({ error: error }))
+                
+            } catch (error) {
+                res.status(500).json({ error })
+            }
+        } else {
+            return res.status(401).json({ message: 'You can\'t modify this message, userId not match !' })
+        }
+
+    })
+    .catch((error) => res.status(404).json({ error: error }))
+}
 
 //Find all Messages
 exports.getAllMessages =   (req, res, next) => {

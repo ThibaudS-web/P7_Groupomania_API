@@ -6,5 +6,6 @@ const auth = require('../middlewares/auth')
 
 router.get('/', auth, messageCtrl.getAllMessages)
 router.post('/', auth, messageCtrl.createMessage)
+router.put('/:id', auth, messageCtrl.modfifyMessageUser)
 
 module.exports = router 

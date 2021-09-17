@@ -62,10 +62,11 @@ module.exports = function (sequelize, DataTypes) {
     title: DataTypes.STRING,
     content: DataTypes.STRING,
     attachment: DataTypes.STRING,
-    likes: DataTypes.INTEGER
+    likes: DataTypes.INTEGER,
+    dislikes: DataTypes.INTEGER
   }, {
     sequelize: sequelize,
     modelName: 'Message'
   });
   return Message;
-};
+}; //table associaton pour userLiked. BelongsTomanyn, regarder principe association/jointure
