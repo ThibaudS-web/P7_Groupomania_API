@@ -1,7 +1,5 @@
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var jwt = require('jsonwebtoken');
 
 var models = require('../models'); //Create a message
@@ -12,15 +10,18 @@ exports.createMessage = function (req, res, next) {
   var title = req.body.title;
   var content = req.body.content;
   var userId = req.body.userId;
+  var attachment = "".concat(req.protocol, "://").concat(req.get('host'), "/images/").concat(req.file.filename);
   var newMessage = {
     userId: userId,
     title: title,
-    content: content
+    content: content,
+    attachment: attachment
   };
 
   try {
-    models.Message.create(newMessage).then(function () {
+    models.Message.create(newMessage).then(function (newMessage) {
       return res.status(201).json({
+        newMessage: newMessage,
         message: 'Message created !'
       });
     })["catch"](function (error) {
@@ -51,10 +52,11 @@ exports.modfifyMessageUser = function (req, res, next) {
           where: {
             id: req.params.id
           }
-        }).then(function (message) {
-          return res.status(201).json(_defineProperty({
-            message: message
-          }, "message", 'Message updated ! '));
+        }).then(function (messageUpdated) {
+          return res.status(201).json({
+            messageUpdated: messageUpdated,
+            message: 'Message updated ! '
+          });
         })["catch"](function (error) {
           return res.status(400).json({
             error: error

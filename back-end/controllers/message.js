@@ -10,16 +10,17 @@ exports.createMessage = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content    
     const userId =  req.body.userId
+    const attachment = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
 
     const newMessage = {
         userId: userId,
         title: title, 
         content: content,
+        attachment: attachment
     }
-
     try {
         models.Message.create(newMessage)
-        .then(() => res.status(201).json({ message: 'Message created !'}))
+        .then((newMessage) => res.status(201).json({newMessage, message: 'Message created !'}))
         .catch((error) => res.status(400).json({ error }))
     } catch (error) {
         res.status(500).json({ error })
@@ -30,7 +31,7 @@ exports.createMessage = (req, res, next) => {
 
 exports.modfifyMessageUser =  (req, res, next) => {
     const userId =  req.body.userId
-
+    
     models.Message.findOne(
         {
             where: {id: req.params.id}
@@ -46,7 +47,7 @@ exports.modfifyMessageUser =  (req, res, next) => {
                     },
                     {where: {id: req.params.id}}             
                 )
-                .then((message) => res.status(201).json({ message, message : 'Message updated ! ' }))
+                .then((messageUpdated) => res.status(201).json({ messageUpdated, message : 'Message updated ! ' }))
                 .catch((error) => res.status(400).json({ error: error }))
                 
             } catch (error) {

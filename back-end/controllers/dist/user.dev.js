@@ -183,17 +183,65 @@ exports.login = function _callee2(req, res, next) {
   });
 };
 
-exports.getMyProfil = function (req, res, next) {
-  var userId = req.body.userId;
+exports.findOneProfil = function (req, res, next) {
+  var userId = req.params.id;
   models.User.findOne({
     attributes: ['id', 'bio', 'username', 'picture'],
     where: {
       id: userId
     }
-  }).then(function (myProfil) {
+  }).then(function (profil) {
     return res.status(200).json({
-      myProfil: myProfil
+      profil: profil
     });
+  })["catch"](function (error) {
+    return res.status(404).json({
+      error: error
+    });
+  });
+};
+
+exports.modifyProfil = function (req, res, next) {
+  var userId = req.body.userId;
+  var bio = req.body.bio;
+  var username = req.body.username;
+  var picture = req.body.picture;
+  models.User.findOne({
+    attributes: ['id', 'bio', 'username', 'picture'],
+    where: {
+      id: userId
+    }
+  }).then(function (profil) {
+    if (userId == profil.id) {
+      try {
+        models.User.update({
+          bio: bio,
+          username: username,
+          picture: picture
+        }, {
+          where: {
+            id: userId
+          }
+        }).then(function (profil) {
+          return res.status(201).json({
+            profil: profil,
+            message: 'Profil was updated !'
+          });
+        })["catch"](function (error) {
+          return res.status(400).json({
+            error: error
+          });
+        });
+      } catch (error) {
+        return res.status(500).json({
+          error: error
+        });
+      }
+    } else {
+      return res.status(401).json({
+        message: 'You can\'t update this profil, userId not match !'
+      });
+    }
   })["catch"](function (error) {
     return res.status(404).json({
       error: error

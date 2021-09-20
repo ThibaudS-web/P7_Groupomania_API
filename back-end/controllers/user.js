@@ -69,8 +69,8 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
 
     //Body request
-    let email    = req.body.email;
-    let password = req.body.password;
+    let email    = req.body.email
+    let password = req.body.password
 
     //Return an error if password, email or username is an empty field
     if(password == undefined || email == undefined) {
@@ -102,16 +102,51 @@ exports.login = async (req, res, next) => {
     }
 }
 
-exports.getMyProfil = (req, res, next) => {
 
-    const userId = req.body.userId
-    
+exports.findOneProfil = (req, res, next) => {
+
+    const userId = req.params.id
+
     models.User.findOne({
         attributes: ['id', 'bio', 'username', 'picture'],
         where: { id: userId }
     })
-    .then((myProfil) => res.status(200).json({ myProfil }))
+    .then((profil) => res.status(200).json({ profil }))
     .catch((error) => res.status(404).json({ error }))
-}   
+}
+
+exports.modifyProfil = (req, res, next) => {
+   
+    const userId = req.body.userId
+    let bio = req.body.bio
+    let username = req.body.username
+    let picture = req.body.picture
+
+    models.User.findOne({
+        attributes: ['id', 'bio', 'username', 'picture'],
+        where: { id: userId }
+    })
+    .then((profil) => {
+        if (userId == profil.id) {
+            try {
+                models.User.update(
+                    {
+                        bio: bio,
+                        username: username,
+                        picture: picture
+                    },
+                    {where: {id: userId}}   
+                )
+                .then((profil) => res.status(201).json({profil, message: 'Profil was updated !' }))
+                .catch((error) => res.status(400).json({ error }))
+            } catch (error) {
+                return res.status(500).json({ error })
+            }
+        } else {
+            return res.status(401).json({ message: 'You can\'t update this profil, userId not match !' })
+        }
+    })
+    .catch((error) => res.status(404).json({ error }))
+}
 
 //validation data node 
