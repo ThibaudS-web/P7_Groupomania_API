@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 var models  = require('../models')
+const fs = require('fs')
 
 
 
@@ -10,7 +11,7 @@ exports.createMessage = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content    
     const userId =  req.body.userId
-    const attachment = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    const attachment = `${req.protocol}://${req.get('host')}/images-mess/${req.file.filename}`
 
     const newMessage = {
         userId: userId,

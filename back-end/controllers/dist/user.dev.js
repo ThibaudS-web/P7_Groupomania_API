@@ -1,7 +1,15 @@
 "use strict";
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //import bcrypt for hashing password in database 
 var bcrypt = require('bcrypt');
+
+var fs = require('fs');
 
 var jwt = require('jsonwebtoken'); //Import user model
 
@@ -205,46 +213,67 @@ exports.modifyProfil = function (req, res, next) {
   var userId = req.body.userId;
   var bio = req.body.bio;
   var username = req.body.username;
-  var picture = req.body.picture;
-  models.User.findOne({
-    attributes: ['id', 'bio', 'username', 'picture'],
-    where: {
-      id: userId
-    }
-  }).then(function (profil) {
-    if (userId == profil.id) {
-      try {
-        models.User.update({
-          bio: bio,
-          username: username,
-          picture: picture
-        }, {
-          where: {
-            id: userId
-          }
-        }).then(function (profil) {
-          return res.status(201).json({
-            profil: profil,
-            message: 'Profil was updated !'
-          });
-        })["catch"](function (error) {
-          return res.status(400).json({
-            error: error
+  var profilObject = req.file ? {
+    bio: bio,
+    username: username,
+    picture: "".concat(req.protocol, "://").concat(req.get('host'), "/images-prof/").concat(req.file.filename)
+  } : {
+    bio: bio,
+    username: username
+  }; // console.log(profilObject)
+
+  if (req.file) {
+    models.User.findOne({
+      attributes: ['id', 'bio', 'username', 'picture'],
+      where: {
+        id: userId
+      }
+    }).then(function (profil) {
+      if (userId == profil.id) {
+        var buf = Buffer.from("".concat(profil.picture));
+        var bufToString = buf.toString('utf8');
+        var filename = bufToString.split('/images-prof/')[1];
+        console.log(filename);
+        fs.unlink("images-prof/".concat(filename), function () {
+          models.User.update(_objectSpread({}, profilObject), {
+            where: {
+              id: userId
+            }
+          }).then(function (profilObject) {
+            return res.status(201).json({
+              profilObject: profilObject,
+              message: 'Profil was updated !'
+            });
+          })["catch"](function (error) {
+            return res.status(400).json({
+              error: error
+            });
           });
         });
-      } catch (error) {
-        return res.status(500).json({
-          error: error
+      } else {
+        return res.status(401).json({
+          message: 'You can\'t update this profil, userId not match !'
         });
       }
-    } else {
-      return res.status(401).json({
-        message: 'You can\'t update this profil, userId not match !'
+    })["catch"](function (error) {
+      return res.status(400).json({
+        error: error
       });
-    }
-  })["catch"](function (error) {
-    return res.status(404).json({
-      error: error
     });
-  });
+  } else {
+    models.User.update(_objectSpread({}, profilObject), {
+      where: {
+        id: userId
+      }
+    }).then(function (profil) {
+      return res.status(201).json({
+        profil: profil,
+        message: 'Profil was updated !'
+      });
+    })["catch"](function (error) {
+      return res.status(400).json({
+        error: error
+      });
+    });
+  }
 }; //validation data node

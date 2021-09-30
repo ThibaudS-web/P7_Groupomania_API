@@ -8,9 +8,9 @@ var messageCtrl = require('../controllers/message');
 
 var auth = require('../middlewares/auth');
 
-var multer = require('../middlewares/multer-config');
+var multerMessage = require('../middlewares/multer-config-mess');
 
 router.get('/', auth, messageCtrl.getAllMessages);
-router.post('/', auth, multer, messageCtrl.createMessage);
+router.post('/', auth, multerMessage, messageCtrl.createMessage);
 router.put('/:id', auth, messageCtrl.modfifyMessageUser);
 module.exports = router;

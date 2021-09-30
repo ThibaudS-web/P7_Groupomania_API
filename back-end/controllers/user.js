@@ -1,5 +1,6 @@
 //import bcrypt for hashing password in database 
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const  fs  = require('fs');
 const jwt = require('jsonwebtoken');
 
 //Import user model
@@ -116,37 +117,60 @@ exports.findOneProfil = (req, res, next) => {
 }
 
 exports.modifyProfil = (req, res, next) => {
-   
     const userId = req.body.userId
     let bio = req.body.bio
     let username = req.body.username
-    let picture = req.body.picture
 
-    models.User.findOne({
-        attributes: ['id', 'bio', 'username', 'picture'],
-        where: { id: userId }
-    })
-    .then((profil) => {
-        if (userId == profil.id) {
-            try {
-                models.User.update(
-                    {
-                        bio: bio,
-                        username: username,
-                        picture: picture
-                    },
-                    {where: {id: userId}}   
-                )
-                .then((profil) => res.status(201).json({profil, message: 'Profil was updated !' }))
-                .catch((error) => res.status(400).json({ error }))
-            } catch (error) {
-                return res.status(500).json({ error })
+
+    const profilObject = req.file ? 
+    {   
+        bio: bio,
+        username: username,
+        picture: `${req.protocol}://${req.get('host')}/images-prof/${req.file.filename}`
+
+    } : {
+        bio: bio,
+        username: username
+    }
+    // console.log(profilObject)
+
+    if(req.file) {
+        models.User.findOne({
+            attributes: ['id', 'bio', 'username', 'picture'],
+            where: { id: userId }
+        })
+        .then((profil) => {
+            if (userId == profil.id) {               
+                    const buf = Buffer.from(`${profil.picture}`)
+                    const bufToString = buf.toString('utf8')
+                    const filename = bufToString.split('/images-prof/')[1] 
+                    console.log(filename)
+                    fs.unlink(`images-prof/${filename}`, () => {
+                        
+                        models.User.update(
+                            {
+                                ...profilObject
+                            },
+                            {where: {id: userId}}   
+                        )
+                        .then((profilObject) => res.status(201).json({profilObject, message: 'Profil was updated !' }))
+                        .catch((error) => res.status(400).json({ error }))
+                        })
+            } else {
+                return res.status(401).json({ message: 'You can\'t update this profil, userId not match !' })
             }
-        } else {
-            return res.status(401).json({ message: 'You can\'t update this profil, userId not match !' })
-        }
-    })
-    .catch((error) => res.status(404).json({ error }))
+        })
+        .catch((error) => res.status(400).json({ error }))
+    } else {
+        models.User.update(
+            {
+                ...profilObject
+            },
+            {where: {id: userId}}   
+        )
+        .then((profil) => res.status(201).json({profil, message: 'Profil was updated !' }))
+        .catch((error) => res.status(400).json({ error }))
+    }
 }
 
 //validation data node 

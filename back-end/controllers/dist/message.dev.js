@@ -2,7 +2,9 @@
 
 var jwt = require('jsonwebtoken');
 
-var models = require('../models'); //Create a message
+var models = require('../models');
+
+var fs = require('fs'); //Create a message
 
 
 exports.createMessage = function (req, res, next) {
@@ -10,7 +12,7 @@ exports.createMessage = function (req, res, next) {
   var title = req.body.title;
   var content = req.body.content;
   var userId = req.body.userId;
-  var attachment = "".concat(req.protocol, "://").concat(req.get('host'), "/images/").concat(req.file.filename);
+  var attachment = "".concat(req.protocol, "://").concat(req.get('host'), "/images-mess/").concat(req.file.filename);
   var newMessage = {
     userId: userId,
     title: title,
