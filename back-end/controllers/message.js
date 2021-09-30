@@ -62,6 +62,32 @@ exports.modfifyMessageUser =  (req, res, next) => {
     .catch((error) => res.status(404).json({ error: error }))
 }
 
+//delete message
+
+exports.deleteMessage = (req, res, next) => {
+    
+    try {
+        models.Message.findOne({
+            where: {id: req.params.id}
+        })
+        .then((message) => {    
+            const buf = Buffer.from(`${message.attachment}`)
+            const bufToString = buf.toString('utf8')
+            const filename = bufToString.split('/images-mess/')[1] 
+            fs.unlink(`images-mess/${filename}`, () => {
+                models.Message.destroy({
+                    where: {id: req.params.id}
+                })
+                .then(() => res.status(200).json({ message: 'Message Deleted !' }))
+                .catch((error) => res.status(400).json({ error }))
+            })
+        })
+        .catch((error) => res.status(404).json({ error }))
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+}
+
 //Find all Messages
 exports.getAllMessages =   (req, res, next) => {
     

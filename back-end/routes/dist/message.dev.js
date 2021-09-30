@@ -13,4 +13,5 @@ var multerMessage = require('../middlewares/multer-config-mess');
 router.get('/', auth, messageCtrl.getAllMessages);
 router.post('/', auth, multerMessage, messageCtrl.createMessage);
 router.put('/:id', auth, messageCtrl.modfifyMessageUser);
+router["delete"]('/:id', auth, messageCtrl.deleteMessage);
 module.exports = router;

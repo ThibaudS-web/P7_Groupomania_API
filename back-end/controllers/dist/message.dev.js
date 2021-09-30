@@ -79,6 +79,44 @@ exports.modfifyMessageUser = function (req, res, next) {
       error: error
     });
   });
+}; //delete message
+
+
+exports.deleteMessage = function (req, res, next) {
+  try {
+    models.Message.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).then(function (message) {
+      var buf = Buffer.from("".concat(message.attachment));
+      var bufToString = buf.toString('utf8');
+      var filename = bufToString.split('/images-mess/')[1];
+      fs.unlink("images-mess/".concat(filename), function () {
+        models.Message.destroy({
+          where: {
+            id: req.params.id
+          }
+        }).then(function () {
+          return res.status(200).json({
+            message: 'Message Deleted !'
+          });
+        })["catch"](function (error) {
+          return res.status(400).json({
+            error: error
+          });
+        });
+      });
+    })["catch"](function (error) {
+      return res.status(404).json({
+        error: error
+      });
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error
+    });
+  }
 }; //Find all Messages
 
 
