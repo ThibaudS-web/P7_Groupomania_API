@@ -32,6 +32,7 @@ exports.createMessage = (req, res, next) => {
 
 exports.modfifyMessageUser =  (req, res, next) => {
     const userId =  req.body.userId
+    const content = req.body.content
     
     models.Message.findOne(
         {
@@ -39,12 +40,11 @@ exports.modfifyMessageUser =  (req, res, next) => {
         }
     )
     .then((message) => {
-        if(userId == message.userId) {
-            
+        if(userId == message.userId) {  
             try {
                 models.Message.update(
                     {  
-                        content: req.body.content,
+                        content: content
                     },
                     {where: {id: req.params.id}}             
                 )
@@ -55,7 +55,7 @@ exports.modfifyMessageUser =  (req, res, next) => {
                 res.status(500).json({ error })
             }
         } else {
-            return res.status(401).json({ message: 'You can\'t modify this message, userId not match !' })
+            res.status(401).json({ message: 'You can\'t modify this message, userId not match !' })
         }
 
     })
@@ -71,9 +71,7 @@ exports.deleteMessage = (req, res, next) => {
             where: {id: req.params.id}
         })
         .then((message) => {    
-            const buf = Buffer.from(`${message.attachment}`)
-            const bufToString = buf.toString('utf8')
-            const filename = bufToString.split('/images-mess/')[1] 
+            const filename = message.attachment.split('/images-mess/')[1] 
             fs.unlink(`images-mess/${filename}`, () => {
                 models.Message.destroy({
                     where: {id: req.params.id}
