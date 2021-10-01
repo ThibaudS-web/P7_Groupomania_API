@@ -30,7 +30,7 @@ exports.createMessage = (req, res, next) => {
 
 //Modify the user message 
 
-exports.modfifyMessageUser =  (req, res, next) => {
+exports.modifyMessageUser =  (req, res, next) => {
     const userId =  req.body.userId
     const content = req.body.content
     
