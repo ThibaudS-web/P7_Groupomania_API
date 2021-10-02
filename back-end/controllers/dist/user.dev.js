@@ -220,7 +220,7 @@ exports.modifyProfil = function (req, res, next) {
   } : {
     bio: bio,
     username: username
-  }; // console.log(profilObject)
+  };
 
   if (req.file) {
     models.User.findOne({
@@ -230,10 +230,7 @@ exports.modifyProfil = function (req, res, next) {
       }
     }).then(function (profil) {
       if (userId == profil.id) {
-        var buf = Buffer.from("".concat(profil.picture));
-        var bufToString = buf.toString('utf8');
-        var filename = bufToString.split('/images-prof/')[1];
-        console.log(filename);
+        var filename = profil.picture.split('/images-prof/')[1];
         fs.unlink("images-prof/".concat(filename), function () {
           models.User.update(_objectSpread({}, profilObject), {
             where: {

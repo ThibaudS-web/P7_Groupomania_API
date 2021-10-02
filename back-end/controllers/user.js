@@ -132,7 +132,6 @@ exports.modifyProfil = (req, res, next) => {
         bio: bio,
         username: username
     }
-    // console.log(profilObject)
 
     if(req.file) {
         models.User.findOne({
@@ -141,10 +140,7 @@ exports.modifyProfil = (req, res, next) => {
         })
         .then((profil) => {
             if (userId == profil.id) {               
-                    const buf = Buffer.from(`${profil.picture}`)
-                    const bufToString = buf.toString('utf8')
-                    const filename = bufToString.split('/images-prof/')[1] 
-                    console.log(filename)
+                    const filename = profil.picture.split('/images-prof/')[1] 
                     fs.unlink(`images-prof/${filename}`, () => {
                         
                         models.User.update(
