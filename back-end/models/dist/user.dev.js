@@ -59,7 +59,7 @@ module.exports = function (sequelize, DataTypes) {
     email: DataTypes.STRING,
     username: DataTypes.STRING,
     password: DataTypes.STRING,
-    picture: DataTypes.BLOB,
+    picture: DataTypes.STRING,
     bio: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN
   }, {

@@ -2,8 +2,6 @@ const jwt = require('jsonwebtoken')
 var models  = require('../models')
 const fs = require('fs')
 
-
-
 //Create a message
 exports.createMessage = (req, res, next) => {
     //body request

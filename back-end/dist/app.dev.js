@@ -8,7 +8,9 @@ var express = require('express');
 
 var bodyParser = require('body-parser');
 
-var rateLimit = require("express-rate-limit"); //Limit request : 10 per sec
+var rateLimit = require("express-rate-limit");
+
+var path = require('path'); //Limit request : 10 per sec
 
 
 var limiter = rateLimit({
@@ -49,7 +51,9 @@ app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   next();
-}); //Body Parser configuration
+});
+app.use('/images-mess', express["static"](path.join(__dirname, 'images-mess')));
+app.use('/images-prof', express["static"](path.join(__dirname, 'images-prof'))); //Body Parser configuration
 
 app.use(bodyParser.urlencoded({
   extended: true

@@ -1,5 +1,6 @@
 //import bcrypt for hashing password in database 
 const bcrypt = require('bcrypt');
+
 const  fs  = require('fs');
 const jwt = require('jsonwebtoken');
 
@@ -140,11 +141,8 @@ exports.modifyProfil = (req, res, next) => {
             where: { id: userId }
         })
         .then((profil) => {
-            if (userId == profil.id) {               
-                    const buf = Buffer.from(`${profil.picture}`)
-                    const bufToString = buf.toString('utf8')
-                    const filename = bufToString.split('/images-prof/')[1] 
-                    console.log(filename)
+            if (userId == profil.id) {      
+                const filename = profil.picture.split('/images-prof/')[1]         
                     fs.unlink(`images-prof/${filename}`, () => {
                         
                         models.User.update(

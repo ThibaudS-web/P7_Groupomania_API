@@ -39,8 +39,9 @@ exports.createMessage = function (req, res, next) {
 }; //Modify the user message 
 
 
-exports.modfifyMessageUser = function (req, res, next) {
+exports.modifyMessageUser = function (req, res, next) {
   var userId = req.body.userId;
+  var content = req.body.content;
   models.Message.findOne({
     where: {
       id: req.params.id
@@ -49,7 +50,7 @@ exports.modfifyMessageUser = function (req, res, next) {
     if (userId == message.userId) {
       try {
         models.Message.update({
-          content: req.body.content
+          content: content
         }, {
           where: {
             id: req.params.id
@@ -70,7 +71,7 @@ exports.modfifyMessageUser = function (req, res, next) {
         });
       }
     } else {
-      return res.status(401).json({
+      res.status(401).json({
         message: 'You can\'t modify this message, userId not match !'
       });
     }
@@ -89,9 +90,7 @@ exports.deleteMessage = function (req, res, next) {
         id: req.params.id
       }
     }).then(function (message) {
-      var buf = Buffer.from("".concat(message.attachment));
-      var bufToString = buf.toString('utf8');
-      var filename = bufToString.split('/images-mess/')[1];
+      var filename = message.attachment.split('/images-mess/')[1];
       fs.unlink("images-mess/".concat(filename), function () {
         models.Message.destroy({
           where: {
