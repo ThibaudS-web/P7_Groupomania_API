@@ -220,7 +220,7 @@ exports.modifyProfil = function (req, res, next) {
   } : {
     bio: bio,
     username: username
-  }; // console.log(profilObject)
+  };
 
   if (req.file) {
     models.User.findOne({
