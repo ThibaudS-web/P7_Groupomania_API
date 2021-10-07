@@ -11,8 +11,6 @@ const limiter = rateLimit({
     max: 10 // limit each IP to 10 requests per seconds
 });
 
-
-
 //import routes
 const userRoutes = require('./routes/user')
 const messageRoutes = require('./routes/message')
