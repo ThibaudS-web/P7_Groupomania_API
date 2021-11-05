@@ -87,7 +87,7 @@ exports.login = async (req, res, next) => {
         bcrypt.compare(password, user.password)
         .then(valid => {
             if(!valid) {
-                return res.status(401).json({ message:'Wrong credentials !'})
+                return res.status(401).json({ message:'Wrong credentials !', })
             }
             const tokenUser = {
                 userId: user.id,
@@ -97,7 +97,7 @@ exports.login = async (req, res, next) => {
                     { expiresIn: '24h'}                            
                 )
             }
-            res.status(200).json(tokenUser)    
+            return res.status(200).json(tokenUser)
         })
     } else {
         return res.status(401).json({ message:'User not found !'})
