@@ -8,7 +8,7 @@ exports.createMessage = (req, res, next) => {
 
     const title = req.body.title
     const content = req.body.content
-    const userId = req.body.userId
+    const userId = req.body.userId// GET ID FROM TOKEN
 
 
     const newMessage = req.file ? {
@@ -25,7 +25,7 @@ exports.createMessage = (req, res, next) => {
 
     try {
         models.Message.create(newMessage)
-            .then((newMessage) => res.status(201).json({ newMessage, message: 'Message created !' }))
+            .then((newMessage) => res.status(201).json(newMessage))
             .catch((error) => res.status(400).json({ error }))
     } catch (error) {
         res.status(500).json({ error })
@@ -52,14 +52,14 @@ exports.modifyMessageUser = (req, res, next) => {
                         },
                         { where: { id: req.params.id } }
                     )
-                        .then((messageUpdated) => res.status(201).json({ messageUpdated, message: 'Message updated ! ' }))
+                        .then((messageUpdated) => res.status(201).json(messageUpdated))
                         .catch((error) => res.status(400).json({ error: error }))
 
                 } catch (error) {
                     res.status(500).json({ error })
                 }
             } else {
-                res.status(401).json({ message: 'You can\'t modify this message, userId not match !' })
+                res.status(401).json({ message: 'You can\'t modify this message!' })
             }
 
         })
@@ -75,7 +75,12 @@ exports.deleteMessage = (req, res, next) => {
             where: { id: req.params.id }
         })
             .then((message) => {
-                const filename = req.file ? message.attachment.split('/images-mess/')[1] : null
+
+                const filename = req.file ?
+                    message.attachment.split('/images-mess/')[1]
+                    :
+                    null
+
                 if (userId == message.userId && filename !== null) {
                     fs.unlink(`images-mess/${filename}`, () => {
                         models.Message.destroy({
@@ -91,7 +96,7 @@ exports.deleteMessage = (req, res, next) => {
                         .then(() => res.status(200).json({ message: 'Message Deleted !' }))
                         .catch((error) => res.status(400).json({ error }))
                 } else {
-                    res.status(401).json({ message: 'You can\'t delete this message, userId not match !' })
+                    res.status(401).json({ message: 'You can\'t delete this message!' })
                 }
             })
             .catch((error, text) => res.status(404).json({ error }))
