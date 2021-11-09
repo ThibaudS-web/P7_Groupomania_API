@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       models.Message.belongsTo(models.User, {
         foreignKey: {
           allowNull: false,
-          name: 'userId'
+          name: 'userId',
         }
       })
     }
@@ -32,4 +32,5 @@ module.exports = (sequelize, DataTypes) => {
   });
   return Message;
 };
+//jointure docs sequelize 
 //table associaton pour userLiked. BelongsTomanyn, regarder principe association/jointure
