@@ -15,19 +15,14 @@ const limiter = rateLimit({
 const userRoutes = require('./routes/user')
 const messageRoutes = require('./routes/message')
 
-//Connexion at the database "groupomaniadb_development"
-// const sequelize = new Sequelize("groupomaniadb_development", "root", "", {
-//   host: "localhost",
-//   dialect: "mysql",
-// });
 const db = require('./models/index')
 const user = require('./models/user')
 const message = require('./models/message')
 //Test the connexion at the Database
+
 try {
     db.sequelize.authenticate();
     console.log('Connection has been established successfully');
-    db.sequelize.sync()
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }

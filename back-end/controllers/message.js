@@ -8,7 +8,7 @@ exports.createMessage = (req, res, next) => {
 
     const title = req.body.title
     const content = req.body.content
-    const userId = req.body.userId// GET ID FROM TOKEN
+    const userId = res.locals.userId
 
 
     const newMessage = req.file ? {
@@ -35,7 +35,7 @@ exports.createMessage = (req, res, next) => {
 //Modify the user message 
 
 exports.modifyMessageUser = (req, res, next) => {
-    const userId = req.body.userId
+    const userId = res.locals.userId
     const content = req.body.content
 
     models.Message.findOne(
@@ -69,27 +69,25 @@ exports.modifyMessageUser = (req, res, next) => {
 //delete message
 
 exports.deleteMessage = (req, res, next) => {
-    const userId = req.body.userId
+    const userId = res.locals.userId
     try {
         models.Message.findOne({
             where: { id: req.params.id }
         })
             .then((message) => {
-
-                const filename = req.file ?
+                const filename = message.attachment ?
                     message.attachment.split('/images-mess/')[1]
                     :
-                    null
-
+                    null      
                 if (userId == message.userId && filename !== null) {
-                    fs.unlink(`images-mess/${filename}`, () => {
+                    fs.unlink(`images-mess/${filename}`, () => {  
                         models.Message.destroy({
                             where: { id: req.params.id }
                         })
                             .then(() => res.status(200).json({ message: 'Message Deleted !' }))
                             .catch((error) => res.status(400).json({ error }))
                     })
-                } else if (userId == message.userId && filename === null) {
+                } else if (userId == message.userId && filename === null) {    
                     models.Message.destroy({
                         where: { id: req.params.id }
                     })
