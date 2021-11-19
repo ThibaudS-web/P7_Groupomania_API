@@ -4,28 +4,31 @@ var jwt = require('jsonwebtoken');
 
 var models = require('../models');
 
-var fs = require('fs'); //Create a message
+var fs = require('fs');
+
+var user = require('../models/user'); //Create a message
 
 
 exports.createMessage = function (req, res, next) {
   //body request
   var title = req.body.title;
   var content = req.body.content;
-  var userId = req.body.userId;
-  var attachment = "".concat(req.protocol, "://").concat(req.get('host'), "/images-mess/").concat(req.file.filename);
-  var newMessage = {
+  var userId = res.locals.userId;
+  var newMessage = req.file ? {
     userId: userId,
     title: title,
     content: content,
-    attachment: attachment
+    attachment: "".concat(req.protocol, "://").concat(req.get('host'), "/images-mess/").concat(req.file.filename)
+  } : {
+    userId: userId,
+    title: title,
+    content: content,
+    attachment: null
   };
 
   try {
     models.Message.create(newMessage).then(function (newMessage) {
-      return res.status(201).json({
-        newMessage: newMessage,
-        message: 'Message created !'
-      });
+      return res.status(201).json(newMessage);
     })["catch"](function (error) {
       return res.status(400).json({
         error: error
@@ -40,14 +43,14 @@ exports.createMessage = function (req, res, next) {
 
 
 exports.modifyMessageUser = function (req, res, next) {
-  var userId = req.body.userId;
+  var userId = res.locals.userId;
   var content = req.body.content;
   models.Message.findOne({
     where: {
       id: req.params.id
     }
-  }).then(function (message) {
-    if (userId == message.userId) {
+  }).then(function (foundMessage) {
+    if (userId == foundMessage.userId) {
       try {
         models.Message.update({
           content: content
@@ -56,10 +59,7 @@ exports.modifyMessageUser = function (req, res, next) {
             id: req.params.id
           }
         }).then(function (messageUpdated) {
-          return res.status(201).json({
-            messageUpdated: messageUpdated,
-            message: 'Message updated ! '
-          });
+          return res.status(201).json(messageUpdated);
         })["catch"](function (error) {
           return res.status(400).json({
             error: error
@@ -72,7 +72,7 @@ exports.modifyMessageUser = function (req, res, next) {
       }
     } else {
       res.status(401).json({
-        message: 'You can\'t modify this message, userId not match !'
+        message: 'You can\'t modify this message!'
       });
     }
   })["catch"](function (error) {
@@ -84,14 +84,33 @@ exports.modifyMessageUser = function (req, res, next) {
 
 
 exports.deleteMessage = function (req, res, next) {
+  var userId = res.locals.userId;
+
   try {
     models.Message.findOne({
       where: {
         id: req.params.id
       }
-    }).then(function (message) {
-      var filename = message.attachment.split('/images-mess/')[1];
-      fs.unlink("images-mess/".concat(filename), function () {
+    }).then(function (foundMessage) {
+      var filename = foundMessage.attachment ? foundMessage.attachment.split('/images-mess/')[1] : null;
+
+      if (userId == foundMessage.userId && filename !== null) {
+        fs.unlink("images-mess/".concat(filename), function () {
+          models.Message.destroy({
+            where: {
+              id: req.params.id
+            }
+          }).then(function () {
+            return res.status(200).json({
+              message: 'Message Deleted !'
+            });
+          })["catch"](function (error) {
+            return res.status(400).json({
+              error: error
+            });
+          });
+        });
+      } else if (userId == foundMessage.userId && filename === null) {
         models.Message.destroy({
           where: {
             id: req.params.id
@@ -105,8 +124,12 @@ exports.deleteMessage = function (req, res, next) {
             error: error
           });
         });
-      });
-    })["catch"](function (error) {
+      } else {
+        res.status(401).json({
+          message: 'You can\'t delete this message!'
+        });
+      }
+    })["catch"](function (error, text) {
       return res.status(404).json({
         error: error
       });
@@ -116,12 +139,16 @@ exports.deleteMessage = function (req, res, next) {
       error: error
     });
   }
-}; //Find all Messages
-
+};
 
 exports.getAllMessages = function (req, res, next) {
   try {
-    models.Message.findAll().then(function (messages) {
+    models.Message.findAll({
+      include: {
+        model: models.User,
+        attributes: ['username', 'picture']
+      }
+    }).then(function (messages) {
       return res.status(200).json({
         messages: messages
       });

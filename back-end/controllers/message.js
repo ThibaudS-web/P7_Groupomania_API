@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 var models = require('../models')
 const fs = require('fs')
+const user = require('../models/user')
 
 //Create a message
 exports.createMessage = (req, res, next) => {
@@ -9,7 +10,6 @@ exports.createMessage = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content
     const userId = res.locals.userId
-
 
     const newMessage = req.file ? {
         userId: userId,
@@ -33,7 +33,6 @@ exports.createMessage = (req, res, next) => {
 }
 
 //Modify the user message 
-
 exports.modifyMessageUser = (req, res, next) => {
     const userId = res.locals.userId
     const content = req.body.content
@@ -43,8 +42,8 @@ exports.modifyMessageUser = (req, res, next) => {
             where: { id: req.params.id }
         }
     )
-        .then((message) => {
-            if (userId == message.userId) {
+        .then((foundMessage) => {
+            if (userId == foundMessage.userId) {
                 try {
                     models.Message.update(
                         {
@@ -61,33 +60,31 @@ exports.modifyMessageUser = (req, res, next) => {
             } else {
                 res.status(401).json({ message: 'You can\'t modify this message!' })
             }
-
         })
         .catch((error) => res.status(404).json({ error: error }))
 }
 
 //delete message
-
 exports.deleteMessage = (req, res, next) => {
     const userId = res.locals.userId
     try {
         models.Message.findOne({
             where: { id: req.params.id }
         })
-            .then((message) => {
-                const filename = message.attachment ?
-                    message.attachment.split('/images-mess/')[1]
+            .then((foundMessage) => {
+                const filename = foundMessage.attachment ?
+                    foundMessage.attachment.split('/images-mess/')[1]
                     :
-                    null      
-                if (userId == message.userId && filename !== null) {
-                    fs.unlink(`images-mess/${filename}`, () => {  
+                    null
+                if (userId == foundMessage.userId && filename !== null) {
+                    fs.unlink(`images-mess/${filename}`, () => {
                         models.Message.destroy({
                             where: { id: req.params.id }
                         })
                             .then(() => res.status(200).json({ message: 'Message Deleted !' }))
                             .catch((error) => res.status(400).json({ error }))
                     })
-                } else if (userId == message.userId && filename === null) {    
+                } else if (userId == foundMessage.userId && filename === null) {
                     models.Message.destroy({
                         where: { id: req.params.id }
                     })
@@ -103,11 +100,14 @@ exports.deleteMessage = (req, res, next) => {
     }
 }
 
-//Find all Messages
 exports.getAllMessages = (req, res, next) => {
-
     try {
-        models.Message.findAll()
+        models.Message.findAll({
+            include: {
+                model: models.User,
+                attributes: ['username', 'picture']
+            }
+        })
             .then((messages) => res.status(200).json({ messages }))
             .catch((error) => res.status(400).json({ error }))
     } catch (error) {

@@ -117,56 +117,148 @@ exports.findOneProfil = (req, res, next) => {
         .catch((error) => res.status(404).json({ error }))
 }
 
-exports.modifyProfil = (req, res, next) => {
+
+exports.modifyPictureProfil = (req, res, next) => {
     let userId = res.locals.userId
-    let bio = req.body.bio
-    let username = req.body.username
 
-    const profilObject = req.file ?
-        {   
-            bio: bio,
-            username: username,
-            picture: `${req.protocol}://${req.get('host')}/images-prof/${req.file.filename}`
+    let pictureUrl = `${req.protocol}://${req.get('host')}/images-prof/${req.file.filename}`
 
-        } : {
-            bio: bio,
-            username: username,
-            picture: null
-        }
-        models.User.findOne({
-            attributes: ['id', 'bio', 'username', 'picture'],
-            where: { id: userId }
-        })
-            .then((profil) => {
-                const filename =  profil.picture ?
-                profil.picture.split('/images-prof/')[1]
+    models.User.findOne({
+        attributes: ['id', 'picture'],
+        where: { id: userId }
+    })
+        .then(foundProfil => {
+
+            if (userId == foundProfil.id) {
+                const filename = foundProfil.picture ?
+                    foundProfil.picture.split('/images-prof/')[1]
                     :
                     null
-                if (userId == profil.id && filename !== null) {
-                    fs.unlink(`images-prof/${filename}`, () => {
-                        models.User.update(
-                            {
-                                ...profilObject
-                            },
-                            { where: { id: userId } }
-                        )
-                            .then((profilObject) => res.status(201).json({ profilObject, message: 'Profil was updated!' }))
-                            .catch((error) => res.status(400).json({ error }))
-                    })
-                } else if (userId == profil.id && filename === null) {
+                console.log('========================filename :', filename)
+                fs.unlink(`images-prof/${filename}`, () => {
                     models.User.update(
                         {
-                            ...profilObject
+                            picture: pictureUrl
+                        },
+                        { where: { id: userId }}
+                    )
+                        .then(() => res.status(201).json(pictureUrl))
+                        .catch((error) => res.status(400).json({ error }))
+                })
+            } else {
+                res.status(401).json({ message: 'You can\'t modify this picture!' })
+            }
+        })
+        .catch((error) => res.status(404).json({ error }))
+}
+
+//Deleted profil picture
+exports.deletePictureProfil = (req, res, next) => {
+    const userId = res.locals.userId
+
+    try {
+        models.User.findOne({
+            attributes: ['id', 'picture'],
+            where: { id: userId }
+        })
+            .then(foundProfil => {
+                const picture = foundProfil.picture
+                const filename = picture.split('/images-prof/')[1]
+                console.log('filename', filename)
+                fs.unlink(`images-prof/${filename}`, () => {
+                    models.User.update(
+                        {
+                            picture: null
                         },
                         { where: { id: userId } }
                     )
-                        .then((profil) => res.status(201).json({ profil, message: 'Profil was updated !' }))
+                        .then(() => res.status(200).json({ message: 'Picture Deleted!' }))
                         .catch((error) => res.status(400).json({ error }))
-                } else {
-                    res.status(401).json({ message: 'You can\'t modify this message!' })
-                }
+                })
             })
-            .catch((error) => res.status(404).json({ error }))
-    
+            .catch(error => res.status(404).json({ error }))
+    }
+    catch (error) {
+        res.status(500).json({ error })
+    }
 }
+
+//Updated bio profil
+exports.modifyBioProfil = (req, res, next) => {
+    let userId = res.locals.userId
+    let bio = req.body.bio
+    console.log(bio)
+    try {
+        models.User.findOne({
+            attributes: ['id', 'bio'],
+            where: { id: userId }
+        })
+            .then(() => {
+                    models.User.update(
+                        {
+                           bio: bio
+                        },
+                        { where: { id: userId } }
+                    )
+                        .then(() => res.status(201).json({ message: 'Bio Updated!' }))
+                        .catch((error) => res.status(400).json({ error }))
+                
+            })
+            .catch(error => res.status(404).json({ error }))
+    }
+    catch (error) {
+        res.status(500).json({ error })
+    }
+}
+// exports.modifyProfil = (req, res, next) => {
+
+//     let username = req.body.username
+
+//     const profil = req.file ?
+//         {
+//             bio: bio,
+//             username: username,
+//             picture: `${req.protocol}://${req.get('host')}/images-prof/${req.file.filename}`
+
+//         } : {
+//             bio: bio,
+//             username: username,
+//             picture: null
+//         }
+//     models.User.findOne({
+//         attributes: ['id', 'bio', 'username', 'picture'],
+//         where: { id: userId }
+//     })
+//         .then(foundProfil => {
+//             const filename = foundProfil.picture ?
+//                 foundProfil.picture.split('/images-prof/')[1]
+//                 :
+//                 null
+//             if (userId == foundProfil.id && filename !== null) {
+//                 fs.unlink(`images-prof/${filename}`, () => {
+//                     models.User.update(
+//                         {
+//                             ...profil
+//                         },
+//                         { where: { id: userId } }
+//                     )
+//                         .then((profil) => res.status(201).json({ profil, message: 'Profil was updated!' }))
+//                         .catch((error) => res.status(400).json({ error }))
+//                 })
+//             } else if (userId == foundProfil.id && filename === null) {
+//                 models.User.update(
+//                     {
+//                         ...profil
+//                     },
+//                     { where: { id: userId } }
+//                 )
+//                     .then((profil) => res.status(201).json({ profil, message: 'Profil was updated !' }))
+//                     .catch((error) => res.status(400).json({ error }))
+//             } else {
+//                 res.status(401).json({ message: 'You can\'t modify this message!' })
+//             }
+//         })
+//         .catch((error) => res.status(404).json({ error }))
+
+// }
 //validation data node
