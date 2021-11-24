@@ -1,12 +1,8 @@
 "use strict";
 
-var jwt = require('jsonwebtoken');
-
 var models = require('../models');
 
-var fs = require('fs');
-
-var user = require('../models/user'); //Create a message
+var fs = require('fs'); //Create a message
 
 
 exports.createMessage = function (req, res, next) {
@@ -27,8 +23,13 @@ exports.createMessage = function (req, res, next) {
   };
 
   try {
-    models.Message.create(newMessage).then(function (newMessage) {
-      return res.status(201).json(newMessage);
+    models.Message.create(newMessage, {
+      include: [{
+        model: models.User,
+        attributes: ['username', 'picture']
+      }]
+    }).then(function (newMessageJoinUser) {
+      return res.status(201).json(newMessageJoinUser);
     })["catch"](function (error) {
       return res.status(400).json({
         error: error
@@ -144,10 +145,10 @@ exports.deleteMessage = function (req, res, next) {
 exports.getAllMessages = function (req, res, next) {
   try {
     models.Message.findAll({
-      include: {
+      include: [{
         model: models.User,
         attributes: ['username', 'picture']
-      }
+      }]
     }).then(function (messages) {
       return res.status(200).json({
         messages: messages

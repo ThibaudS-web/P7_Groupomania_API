@@ -67,6 +67,11 @@ module.exports = function (sequelize, DataTypes) {
   }, {
     sequelize: sequelize,
     modelName: 'Message'
+  }); //Permet de charger la jointure de la Table User à la table Message au moment de la création du message
+
+  Message.addHook('afterCreate', function (message, options) {
+    return message.reload();
   });
   return Message;
-}; //table associaton pour userLiked. BelongsTomanyn, regarder principe association/jointure
+}; //jointure docs sequelize 
+//table associaton pour userLiked. BelongsTomanyn, regarder principe association/jointure

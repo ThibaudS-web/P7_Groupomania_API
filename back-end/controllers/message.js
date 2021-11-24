@@ -1,7 +1,5 @@
-const jwt = require('jsonwebtoken')
 var models = require('../models')
 const fs = require('fs')
-const user = require('../models/user')
 
 //Create a message
 exports.createMessage = (req, res, next) => {
@@ -24,8 +22,13 @@ exports.createMessage = (req, res, next) => {
     }
 
     try {
-        models.Message.create(newMessage)
-            .then((newMessage) => res.status(201).json(newMessage))
+        models.Message.create(newMessage, {
+            include: [{
+                model: models.User,
+                attributes: ['username', 'picture']
+            }]
+        })
+            .then((newMessageJoinUser) => res.status(201).json(newMessageJoinUser))
             .catch((error) => res.status(400).json({ error }))
     } catch (error) {
         res.status(500).json({ error })
@@ -103,10 +106,10 @@ exports.deleteMessage = (req, res, next) => {
 exports.getAllMessages = (req, res, next) => {
     try {
         models.Message.findAll({
-            include: {
+            include: [{
                 model: models.User,
                 attributes: ['username', 'picture']
-            }
+            }]
         })
             .then((messages) => res.status(200).json({ messages }))
             .catch((error) => res.status(400).json({ error }))

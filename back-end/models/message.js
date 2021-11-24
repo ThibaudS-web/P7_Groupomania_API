@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Message',
   });
+  //Permet de charger la jointure de la Table User à la table Message au moment de la création du message
+  Message.addHook('afterCreate', (message, options) => {
+    return message.reload()
+  })
   return Message;
 };
 //jointure docs sequelize 
