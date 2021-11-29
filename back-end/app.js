@@ -17,9 +17,10 @@ const messageRoutes = require('./routes/message')
 
 const db = require('./models/index')
 const user = require('./models/user')
-const message = require('./models/message')
-//Test the connexion at the Database
+const message = require('./models/message');
+const comment = require('./models/comment')
 
+//Test the connexion at the Database
 try {
     db.sequelize.authenticate();
     console.log('Connection has been established successfully');

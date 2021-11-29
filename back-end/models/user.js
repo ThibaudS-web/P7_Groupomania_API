@@ -14,8 +14,6 @@ module.exports = (sequelize, DataTypes) => {
       models.User.hasMany(models.Message, {
         foreignKey: { name: 'userId' }
       })
-
-    
     }
   };
   User.init({

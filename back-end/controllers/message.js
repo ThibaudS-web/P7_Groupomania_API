@@ -21,7 +21,7 @@ exports.createMessage = (req, res, next) => {
         attachment: null
     }
 
-    try {
+    try {   
         models.Message.create(newMessage, {
             include: [{
                 model: models.User,

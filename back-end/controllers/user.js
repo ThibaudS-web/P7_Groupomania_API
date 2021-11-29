@@ -140,7 +140,7 @@ exports.modifyPictureProfil = (req, res, next) => {
                         {
                             picture: pictureUrl
                         },
-                        { where: { id: userId }}
+                        { where: { id: userId } }
                     )
                         .then(() => res.status(201).json(pictureUrl))
                         .catch((error) => res.status(400).json({ error }))
@@ -193,16 +193,20 @@ exports.modifyBioProfil = (req, res, next) => {
             attributes: ['id', 'bio'],
             where: { id: userId }
         })
-            .then(() => {
+            .then((foundProfil) => {
+                if (userId == foundProfil.id) {
+                    console.log("ID du profil trouvé: ", foundProfil.id)
                     models.User.update(
                         {
-                           bio: bio
+                            bio: bio
                         },
                         { where: { id: userId } }
                     )
                         .then(() => res.status(201).json({ message: 'Bio Updated!' }))
                         .catch((error) => res.status(400).json({ error }))
-                
+                } else {
+                    return res.status(401).json({ message:  "Not authorized to modify !"})
+                }
             })
             .catch(error => res.status(404).json({ error }))
     }
@@ -210,55 +214,5 @@ exports.modifyBioProfil = (req, res, next) => {
         res.status(500).json({ error })
     }
 }
-// exports.modifyProfil = (req, res, next) => {
 
-//     let username = req.body.username
-
-//     const profil = req.file ?
-//         {
-//             bio: bio,
-//             username: username,
-//             picture: `${req.protocol}://${req.get('host')}/images-prof/${req.file.filename}`
-
-//         } : {
-//             bio: bio,
-//             username: username,
-//             picture: null
-//         }
-//     models.User.findOne({
-//         attributes: ['id', 'bio', 'username', 'picture'],
-//         where: { id: userId }
-//     })
-//         .then(foundProfil => {
-//             const filename = foundProfil.picture ?
-//                 foundProfil.picture.split('/images-prof/')[1]
-//                 :
-//                 null
-//             if (userId == foundProfil.id && filename !== null) {
-//                 fs.unlink(`images-prof/${filename}`, () => {
-//                     models.User.update(
-//                         {
-//                             ...profil
-//                         },
-//                         { where: { id: userId } }
-//                     )
-//                         .then((profil) => res.status(201).json({ profil, message: 'Profil was updated!' }))
-//                         .catch((error) => res.status(400).json({ error }))
-//                 })
-//             } else if (userId == foundProfil.id && filename === null) {
-//                 models.User.update(
-//                     {
-//                         ...profil
-//                     },
-//                     { where: { id: userId } }
-//                 )
-//                     .then((profil) => res.status(201).json({ profil, message: 'Profil was updated !' }))
-//                     .catch((error) => res.status(400).json({ error }))
-//             } else {
-//                 res.status(401).json({ message: 'You can\'t modify this message!' })
-//             }
-//         })
-//         .catch((error) => res.status(404).json({ error }))
-
-// }
 //validation data node

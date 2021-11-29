@@ -21,21 +21,19 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var _require = require('sequelize'),
     Model = _require.Model;
 
-var user = require('./user');
-
 module.exports = function (sequelize, DataTypes) {
-  var Message =
+  var Comment =
   /*#__PURE__*/
   function (_Model) {
-    _inherits(Message, _Model);
+    _inherits(Comment, _Model);
 
-    function Message() {
-      _classCallCheck(this, Message);
+    function Comment() {
+      _classCallCheck(this, Comment);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(Message).apply(this, arguments));
+      return _possibleConstructorReturn(this, _getPrototypeOf(Comment).apply(this, arguments));
     }
 
-    _createClass(Message, null, [{
+    _createClass(Comment, null, [{
       key: "associate",
 
       /**
@@ -45,43 +43,38 @@ module.exports = function (sequelize, DataTypes) {
        */
       value: function associate(models) {
         // define association here
-        models.Message.belongsTo(models.User, {
+        models.Comment.belongsTo(models.User, {
           foreignKey: {
             allowNull: false,
             name: 'userId'
           }
-        }), models.Message.hasMany(models.Comment, {
+        }), models.Comment.belongsTo(models.Message, {
           foreignKey: {
+            allowNull: false,
             name: 'messageId'
           }
         });
       }
     }]);
 
-    return Message;
+    return Comment;
   }(Model);
 
   ;
-  Message.init({
-    title: DataTypes.STRING,
+  Comment.init({
     content: DataTypes.STRING,
-    attachment: DataTypes.STRING,
-    userId: DataTypes.INTEGER
+    userId: DataTypes.INTEGER,
+    messageId: DataTypes.INTEGER
   }, {
     sequelize: sequelize,
-    modelName: 'Message'
+    modelName: 'Comment'
   });
-  Message.sync({
+  Comment.sync({
     alter: true
   }).then(function (data) {
     console.log('Table and Model synced with sucessfully!');
   })["catch"](function (err) {
     console.log('Error syncing the table and model!');
-  }); //Permet de charger la jointure de la Table User à la table Message au moment de la création du message (Eager Loading)
-
-  Message.addHook('afterCreate', function (message, options) {
-    return message.reload();
   });
-  return Message;
-}; //jointure docs sequelize
-//table associaton pour userLiked. BelongsTomanyn, regarder principe association/jointure
+  return Comment;
+};
