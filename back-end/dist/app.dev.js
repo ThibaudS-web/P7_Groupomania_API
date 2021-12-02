@@ -24,13 +24,18 @@ var userRoutes = require('./routes/user');
 
 var messageRoutes = require('./routes/message');
 
+var commentRoutes = require('./routes/comment');
+
 var db = require('./models/index');
 
 var user = require('./models/user');
 
 var message = require('./models/message');
 
-var comment = require('./models/comment'); //Test the connexion at the Database
+var comment = require('./models/comment');
+
+var _require2 = require("./models/index"),
+    sequelize = _require2.sequelize; //Test the connexion at the Database
 
 
 try {
@@ -55,6 +60,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
+app.use('/api/comments', commentRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/api/messages', messageRoutes);
 app.use(limiter);

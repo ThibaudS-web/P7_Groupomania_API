@@ -10,4 +10,6 @@ router.post('/', auth, multerMessage, messageCtrl.createMessage)
 router.put('/:id', auth, messageCtrl.modifyMessageUser)
 router.delete('/:id', auth, messageCtrl.deleteMessage)
 
-module.exports = router 
+
+
+module.exports = router

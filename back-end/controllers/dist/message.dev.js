@@ -130,7 +130,7 @@ exports.deleteMessage = function (req, res, next) {
           message: 'You can\'t delete this message!'
         });
       }
-    })["catch"](function (error, text) {
+    })["catch"](function (error) {
       return res.status(404).json({
         error: error
       });
@@ -148,7 +148,15 @@ exports.getAllMessages = function (req, res, next) {
       include: [{
         model: models.User,
         attributes: ['username', 'picture']
-      }]
+      }, {
+        model: models.Comment,
+        attributes: ['content', 'id', 'userId'],
+        include: [{
+          model: models.User,
+          attributes: ['username', 'picture']
+        }]
+      }],
+      order: [['createdAt', 'ASC']]
     }).then(function (messages) {
       return res.status(200).json({
         messages: messages

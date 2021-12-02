@@ -14,11 +14,13 @@ const limiter = rateLimit({
 //import routes
 const userRoutes = require('./routes/user')
 const messageRoutes = require('./routes/message')
+const commentRoutes = require('./routes/comment')
 
 const db = require('./models/index')
 const user = require('./models/user')
 const message = require('./models/message');
-const comment = require('./models/comment')
+const comment = require('./models/comment');
+const { sequelize } = require("./models/index");
 
 //Test the connexion at the Database
 try {
@@ -46,6 +48,7 @@ app.use('/images-prof', express.static(path.join(__dirname, 'images-prof')))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
+app.use('/api/comments', commentRoutes)
 app.use('/api/auth', userRoutes)
 app.use('/api/messages', messageRoutes)
 

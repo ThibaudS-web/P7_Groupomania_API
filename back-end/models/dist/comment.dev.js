@@ -62,19 +62,20 @@ module.exports = function (sequelize, DataTypes) {
 
   ;
   Comment.init({
-    content: DataTypes.STRING,
-    userId: DataTypes.INTEGER,
-    messageId: DataTypes.INTEGER
+    content: DataTypes.STRING
   }, {
     sequelize: sequelize,
     modelName: 'Comment'
   });
-  Comment.sync({
-    alter: true
-  }).then(function (data) {
-    console.log('Table and Model synced with sucessfully!');
-  })["catch"](function (err) {
-    console.log('Error syncing the table and model!');
-  });
+  Comment.addHook('afterCreate', function (comment, options) {
+    return comment.reload();
+  }); // Comment.sync({ alter: true })
+  //     .then((data) => {
+  //         console.log('Table and Model synced with sucessfully!')
+  //     })
+  //     .catch((err) => {
+  //         console.log('Error syncing the table and model!')
+  //     })
+
   return Comment;
 };
