@@ -114,7 +114,7 @@ exports.deleteComment = function (req, res, next) {
 
 exports.getAllComment = function (req, res, next) {
   try {
-    models.Comment.findAll({}).then(function (comments) {
+    models.Comment.findAll().then(function (comments) {
       return res.status(200).json({
         comments: comments
       });

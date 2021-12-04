@@ -18,7 +18,7 @@ exports.createComment = (req, res, next) => {
                 attributes: ['username', 'picture']
             }]
         })
-            .then(newJoinComment =>  res.status(201).json(newJoinComment))
+            .then(newJoinComment => res.status(201).json(newJoinComment))
             .catch((error) => res.status(400).json({ error }))
     } catch (error) {
         res.status(500).json({ error })
@@ -86,8 +86,7 @@ exports.deleteComment = (req, res, next) => {
 
 exports.getAllComment = (req, res, next) => {
     try {
-        models.Comment.findAll({
-        })
+        models.Comment.findAll()
             .then(comments => res.status(200).json({ comments }))
             .catch(error => res.status(400).json({ error }))
     } catch (error) {

@@ -188,7 +188,7 @@ exports.login = function _callee2(req, res, next) {
 exports.findOneProfil = function (req, res, next) {
   var userId = req.params.id;
   models.User.findOne({
-    attributes: ['id', 'bio', 'username', 'picture'],
+    attributes: ['id', 'bio', 'username', 'picture', 'isAdmin'],
     where: {
       id: userId
     }
@@ -330,4 +330,47 @@ exports.modifyBioProfil = function (req, res, next) {
       error: error
     });
   }
-}; //validation data node
+}; // ADMIN 
+
+
+exports.findAllProfils = function (req, res, next) {
+  models.User.findAll().then(function (profils) {
+    return res.status(200).json(profils);
+  })["catch"](function (error) {
+    return res.status(404).json({
+      error: error
+    });
+  });
+};
+
+exports.deleteOneProfil = function (req, res, next) {
+  try {
+    models.User.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).then(function () {
+      models.User.destroy({
+        where: {
+          id: req.params.id
+        }
+      }).then(function () {
+        return res.status(200).json({
+          message: 'profil deleted!'
+        });
+      })["catch"](function (error) {
+        return res.status(400).json({
+          error: error
+        });
+      });
+    })["catch"](function (error) {
+      return res.status(404).json({
+        error: error
+      });
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error
+    });
+  }
+};

@@ -6,12 +6,13 @@ var router = express.Router();
 
 var messageCtrl = require('../controllers/message');
 
-var auth = require('../middlewares/auth');
+var _require = require('../middlewares/auth'),
+    authUser = _require.authUser;
 
 var multerMessage = require('../middlewares/multer-config-mess');
 
-router.get('/', auth, messageCtrl.getAllMessages);
-router.post('/', auth, multerMessage, messageCtrl.createMessage);
-router.put('/:id', auth, messageCtrl.modifyMessageUser);
-router["delete"]('/:id', auth, messageCtrl.deleteMessage);
+router.get('/', authUser, messageCtrl.getAllMessages);
+router.post('/', authUser, multerMessage, messageCtrl.createMessage);
+router.put('/:id', authUser, messageCtrl.modifyMessageUser);
+router["delete"]('/:id', authUser, messageCtrl.deleteMessage);
 module.exports = router;

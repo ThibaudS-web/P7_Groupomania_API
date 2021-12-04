@@ -95,7 +95,7 @@ exports.deleteMessage = function (req, res, next) {
     }).then(function (foundMessage) {
       var filename = foundMessage.attachment ? foundMessage.attachment.split('/images-mess/')[1] : null;
 
-      if (userId == foundMessage.userId && filename !== null) {
+      if (userId == foundMessage.userId || "ADMIN" && filename !== null) {
         fs.unlink("images-mess/".concat(filename), function () {
           models.Message.destroy({
             where: {
@@ -111,7 +111,7 @@ exports.deleteMessage = function (req, res, next) {
             });
           });
         });
-      } else if (userId == foundMessage.userId && filename === null) {
+      } else if (userId == foundMessage.userId || "ADMIN" && filename === null) {
         models.Message.destroy({
           where: {
             id: req.params.id
@@ -150,13 +150,14 @@ exports.getAllMessages = function (req, res, next) {
         attributes: ['username', 'picture']
       }, {
         model: models.Comment,
-        attributes: ['content', 'id', 'userId'],
+        attributes: ['content', 'id', 'userId', 'createdAt'],
         include: [{
           model: models.User,
           attributes: ['username', 'picture']
-        }]
+        }] // order: [['createdAt', 'DESC']],
+
       }],
-      order: [['createdAt', 'ASC']]
+      order: [['createdAt', 'ASC'], ['Comments', 'createdAt', 'ASC']]
     }).then(function (messages) {
       return res.status(200).json({
         messages: messages

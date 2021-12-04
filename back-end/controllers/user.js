@@ -98,6 +98,7 @@ exports.login = async (req, res, next) => {
                     )
                 }
                 return res.status(200).json(tokenUser)
+                
             })
     } else {
         return res.status(401).json({ message: 'User not found !' })
@@ -110,13 +111,12 @@ exports.findOneProfil = (req, res, next) => {
     const userId = req.params.id
 
     models.User.findOne({
-        attributes: ['id', 'bio', 'username', 'picture'],
+        attributes: ['id', 'bio', 'username', 'picture', 'isAdmin'],
         where: { id: userId }
     })
         .then((profil) => res.status(200).json({ profil }))
         .catch((error) => res.status(404).json({ error }))
 }
-
 
 exports.modifyPictureProfil = (req, res, next) => {
     let userId = res.locals.userId
@@ -205,7 +205,7 @@ exports.modifyBioProfil = (req, res, next) => {
                         .then(() => res.status(201).json({ message: 'Bio Updated!' }))
                         .catch((error) => res.status(400).json({ error }))
                 } else {
-                    return res.status(401).json({ message:  "Not authorized to modify !"})
+                    return res.status(401).json({ message: "Not authorized to modify !" })
                 }
             })
             .catch(error => res.status(404).json({ error }))
@@ -215,4 +215,28 @@ exports.modifyBioProfil = (req, res, next) => {
     }
 }
 
-//validation data node
+// ADMIN 
+exports.findAllProfils = (req, res, next) => {
+    models.User.findAll()
+        .then((profils) => res.status(200).json( profils ))
+        .catch((error) => res.status(404).json({ error }))
+}
+
+exports.deleteOneProfil = (req, res, next) => {
+    try {
+        models.User.findOne({
+            where: { id: req.params.id }
+        })
+            .then(() => {
+                models.User.destroy({
+                    where: { id: req.params.id }
+                })
+                    .then(() => res.status(200).json({ message: 'profil deleted!' }))
+                    .catch((error) => res.status(400).json({ error }))
+            })
+            .catch((error) => res.status(404).json({ error }))
+    }
+    catch (error) {
+        res.status(500).json({ error })
+    }
+}

@@ -79,7 +79,7 @@ exports.deleteMessage = (req, res, next) => {
                     foundMessage.attachment.split('/images-mess/')[1]
                     :
                     null
-                if (userId == foundMessage.userId && filename !== null) {
+                if (userId == foundMessage.userId || "ADMIN" && filename !== null) {
                     fs.unlink(`images-mess/${filename}`, () => {
                         models.Message.destroy({
                             where: { id: req.params.id }
@@ -87,7 +87,7 @@ exports.deleteMessage = (req, res, next) => {
                             .then(() => res.status(200).json({ message: 'Message Deleted !' }))
                             .catch((error) => res.status(400).json({ error }))
                     })
-                } else if (userId == foundMessage.userId && filename === null) {
+                } else if (userId == foundMessage.userId || "ADMIN" && filename === null) {
                     models.Message.destroy({
                         where: { id: req.params.id }
                     })
@@ -113,15 +113,17 @@ exports.getAllMessages = (req, res, next) => {
                 },
                 {
                     model: models.Comment,
-                    attributes: ['content', 'id', 'userId'],
+                    attributes: ['content', 'id', 'userId', 'createdAt'],
                     include: [{
                         model: models.User,
                         attributes: ['username', 'picture']
-                    }]
-                }
+                    }],
+                    // order: [['createdAt', 'DESC']],
+                },
             ],
             order: [
-                ['createdAt', 'ASC']
+                ['createdAt', 'ASC'],
+                ['Comments', 'createdAt', 'ASC']
             ]
         })
             .then(messages => res.status(200).json({ messages }))
@@ -130,3 +132,4 @@ exports.getAllMessages = (req, res, next) => {
         res.status(500).json({ error })
     }
 }
+
