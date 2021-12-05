@@ -134,7 +134,6 @@ exports.modifyPictureProfil = (req, res, next) => {
                     foundProfil.picture.split('/images-prof/')[1]
                     :
                     null
-                console.log('========================filename :', filename)
                 fs.unlink(`images-prof/${filename}`, () => {
                     models.User.update(
                         {
@@ -227,12 +226,28 @@ exports.deleteOneProfil = (req, res, next) => {
         models.User.findOne({
             where: { id: req.params.id }
         })
-            .then(() => {
-                models.User.destroy({
-                    where: { id: req.params.id }
-                })
-                    .then(() => res.status(200).json({ message: 'profil deleted!' }))
-                    .catch((error) => res.status(400).json({ error }))
+            .then((foundProfil) => {
+                const filename = foundProfil.picture ?
+                foundProfil.picture.split('/images-prof/')[1]
+                :
+                null
+                    if(filename !== null)  {
+                        fs.unlink(`images-prof/${filename}`, () => {
+                            models.User.destroy({
+                                where: { id: req.params.id }
+                            })
+                                .then(() => res.status(200).json({ message: 'profil deleted!' }))
+                                .catch((error) => res.status(400).json({ error }))
+                        })
+                    } else if (filename === null) {
+                        models.User.destroy({
+                        where: { id: req.params.id }
+                        })
+                            .then(() => res.status(200).json({ message: 'profil deleted!' }))
+                            .catch((error) => res.status(400).json({ error }))
+                    } else  {
+                        res.status(401).json({ message: 'You can\'t delete this profil!' })
+                    }
             })
             .catch((error) => res.status(404).json({ error }))
     }

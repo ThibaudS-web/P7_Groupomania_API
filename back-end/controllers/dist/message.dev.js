@@ -88,15 +88,36 @@ exports.deleteMessage = function (req, res, next) {
   var userId = res.locals.userId;
 
   try {
-    models.Message.findOne({
+    models.User.findOne({
+      attributes: ['isAdmin'],
       where: {
-        id: req.params.id
+        id: userId
       }
-    }).then(function (foundMessage) {
-      var filename = foundMessage.attachment ? foundMessage.attachment.split('/images-mess/')[1] : null;
+    }).then(function (foundUser) {
+      models.Message.findOne({
+        where: {
+          id: req.params.id
+        }
+      }).then(function (foundMessage) {
+        var filename = foundMessage.attachment ? foundMessage.attachment.split('/images-mess/')[1] : null;
 
-      if (userId == foundMessage.userId || "ADMIN" && filename !== null) {
-        fs.unlink("images-mess/".concat(filename), function () {
+        if (userId == foundMessage.userId || foundUser.isAdmin && filename !== null) {
+          fs.unlink("images-mess/".concat(filename), function () {
+            models.Message.destroy({
+              where: {
+                id: req.params.id
+              }
+            }).then(function () {
+              return res.status(200).json({
+                message: 'Message Deleted !'
+              });
+            })["catch"](function (error) {
+              return res.status(400).json({
+                error: error
+              });
+            });
+          });
+        } else if (userId == foundMessage.userId || foundUser.isAdmin && filename === null) {
           models.Message.destroy({
             where: {
               id: req.params.id
@@ -110,26 +131,12 @@ exports.deleteMessage = function (req, res, next) {
               error: error
             });
           });
-        });
-      } else if (userId == foundMessage.userId || "ADMIN" && filename === null) {
-        models.Message.destroy({
-          where: {
-            id: req.params.id
-          }
-        }).then(function () {
-          return res.status(200).json({
-            message: 'Message Deleted !'
+        } else {
+          res.status(401).json({
+            message: 'You can\'t delete this message!'
           });
-        })["catch"](function (error) {
-          return res.status(400).json({
-            error: error
-          });
-        });
-      } else {
-        res.status(401).json({
-          message: 'You can\'t delete this message!'
-        });
-      }
+        }
+      });
     })["catch"](function (error) {
       return res.status(404).json({
         error: error
@@ -153,11 +160,10 @@ exports.getAllMessages = function (req, res, next) {
         attributes: ['content', 'id', 'userId', 'createdAt'],
         include: [{
           model: models.User,
-          attributes: ['username', 'picture']
-        }] // order: [['createdAt', 'DESC']],
-
+          attributes: ['username', 'picture', 'isAdmin']
+        }]
       }],
-      order: [['createdAt', 'ASC'], ['Comments', 'createdAt', 'ASC']]
+      order: [['createdAt', 'DESC'], ['Comments', 'createdAt', 'ASC']]
     }).then(function (messages) {
       return res.status(200).json({
         messages: messages
