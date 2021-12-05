@@ -75,7 +75,7 @@ exports.deleteMessage = (req, res, next) => {
             attributes: ['isAdmin'],
             where: { id: userId }
         })
-            .then(foundUser => {
+            .then(currentUser => {
                 models.Message.findOne({
                     where: { id: req.params.id }
                 })
@@ -84,7 +84,7 @@ exports.deleteMessage = (req, res, next) => {
                             foundMessage.attachment.split('/images-mess/')[1]
                             :
                             null
-                        if (userId == foundMessage.userId || foundUser.isAdmin && filename !== null) {
+                        if (userId == foundMessage.userId || currentUser.isAdmin && filename !== null) {
                             fs.unlink(`images-mess/${filename}`, () => {
                                 models.Message.destroy({
                                     where: { id: req.params.id }
@@ -92,7 +92,7 @@ exports.deleteMessage = (req, res, next) => {
                                     .then(() => res.status(200).json({ message: 'Message Deleted !' }))
                                     .catch((error) => res.status(400).json({ error }))
                             })
-                        } else if (userId == foundMessage.userId || foundUser.isAdmin && filename === null) {
+                        } else if (userId == foundMessage.userId || currentUser.isAdmin && filename === null) {
                             models.Message.destroy({
                                 where: { id: req.params.id }
                             })
@@ -104,7 +104,6 @@ exports.deleteMessage = (req, res, next) => {
                     })
             })
             .catch(error => res.status(404).json({ error }))
-
     } catch (error) {
         res.status(500).json({ error })
     }
