@@ -15,7 +15,7 @@ exports.createComment = (req, res, next) => {
         models.Comment.create(newComment, {
             include: [{
                 model: models.User,
-                attributes: ['username', 'picture']
+                attributes: ['username', 'picture', 'isAdmin']
             }]
         })
             .then(newJoinComment => res.status(201).json(newJoinComment))
