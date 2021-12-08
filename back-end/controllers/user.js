@@ -28,7 +28,7 @@ exports.signup = async (req, res, next) => {
     }
 
     //Return an error if the username length is not between 3 and 12 characters
-    if (username.length <= 2 || username.length >= 13) {
+    if (username.length <= 2 || username.length >= 21) {
         return res.status(400).json({ error: "username length should be between 3 and 12 characters" })
     }
 

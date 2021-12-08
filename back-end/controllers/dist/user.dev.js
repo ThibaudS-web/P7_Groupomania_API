@@ -38,7 +38,7 @@ exports.signup = function _callee(req, res, next) {
           }));
 
         case 9:
-          if (!(username.length <= 2 || username.length >= 13)) {
+          if (!(username.length <= 2 || username.length >= 21)) {
             _context.next = 11;
             break;
           }
@@ -214,7 +214,6 @@ exports.modifyPictureProfil = function (req, res, next) {
   }).then(function (foundProfil) {
     if (userId == foundProfil.id) {
       var filename = foundProfil.picture ? foundProfil.picture.split('/images-prof/')[1] : null;
-      console.log('========================filename :', filename);
       fs.unlink("images-prof/".concat(filename), function () {
         models.User.update({
           picture: pictureUrl
@@ -349,20 +348,44 @@ exports.deleteOneProfil = function (req, res, next) {
       where: {
         id: req.params.id
       }
-    }).then(function () {
-      models.User.destroy({
-        where: {
-          id: req.params.id
-        }
-      }).then(function () {
-        return res.status(200).json({
-          message: 'profil deleted!'
+    }).then(function (foundProfil) {
+      var filename = foundProfil.picture ? foundProfil.picture.split('/images-prof/')[1] : null;
+
+      if (filename !== null) {
+        fs.unlink("images-prof/".concat(filename), function () {
+          models.User.destroy({
+            where: {
+              id: req.params.id
+            }
+          }).then(function () {
+            return res.status(200).json({
+              message: 'profil deleted!'
+            });
+          })["catch"](function (error) {
+            return res.status(400).json({
+              error: error
+            });
+          });
         });
-      })["catch"](function (error) {
-        return res.status(400).json({
-          error: error
+      } else if (filename === null) {
+        models.User.destroy({
+          where: {
+            id: req.params.id
+          }
+        }).then(function () {
+          return res.status(200).json({
+            message: 'profil deleted!'
+          });
+        })["catch"](function (error) {
+          return res.status(400).json({
+            error: error
+          });
         });
-      });
+      } else {
+        res.status(401).json({
+          message: 'You can\'t delete this profil!'
+        });
+      }
     })["catch"](function (error) {
       return res.status(404).json({
         error: error
