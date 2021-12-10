@@ -69,13 +69,6 @@ module.exports = function (sequelize, DataTypes) {
   });
   Comment.addHook('afterCreate', function (comment, options) {
     return comment.reload();
-  }); // Comment.sync({ alter: true })
-  //     .then((data) => {
-  //         console.log('Table and Model synced with sucessfully!')
-  //     })
-  //     .catch((err) => {
-  //         console.log('Error syncing the table and model!')
-  //     })
-
+  });
   return Comment;
 };

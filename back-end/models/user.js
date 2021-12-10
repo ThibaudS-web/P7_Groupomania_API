@@ -27,14 +27,6 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
-
-      // User.sync({ alter: true })
-      //   .then((data) => {
-      //       console.log('Table and Model synced with sucessfully!')
-      //   })
-      //   .catch((err) => {
-      //       console.log('Error syncing the table and model!')
-      //   })
-
+  
   return User;
 };
