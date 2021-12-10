@@ -1,6 +1,17 @@
 var models = require('../models')
 const fs = require('fs')
 
+const destroyMessage = async function (messageId) {
+    try {
+        await models.Message.destroy({
+            where: { id: messageId }
+        })
+        res.status(200).json({ message: "Message Deleted!" })
+    } catch (error) {
+        res.status(400).json({ error })
+    }
+}
+
 //Create a message
 exports.createMessage = (req, res, next) => {
     //body request
@@ -68,45 +79,34 @@ exports.modifyMessageUser = (req, res, next) => {
 }
 
 //delete message
-exports.deleteMessage = (req, res, next) => {
+exports.deleteMessage = async (req, res, next) => {
     const userId = res.locals.userId
     try {
-        models.User.findOne({
+        const currentUser = await models.User.findOne({
             attributes: ['isAdmin'],
             where: { id: userId }
         })
-            .then(currentUser => {
-                models.Message.findOne({
-                    where: { id: req.params.id }
+        const foundMessage = await models.Message.findOne({
+            where: { id: req.params.id }
+        })
+        const filename = foundMessage.attachment ?
+            foundMessage.attachment.split('/images-mess/')[1]
+            :
+            null
+        if (userId == foundMessage.userId || currentUser.isAdmin) {
+            if (filename === null) {
+                destroyMessage(foundMessage.id)
+                res.status(200).json({ message: 'Message Deleted !' })
+            } else {
+                fs.unlink(`images-mess/${filename}`, async () => {
+                    destroyMessage(foundMessage.id)
+                    res.status(200).json({ message: 'Message Deleted !' })
                 })
-                    .then((foundMessage) => {
-                        const filename = foundMessage.attachment ?
-                            foundMessage.attachment.split('/images-mess/')[1]
-                            :
-                            null
-                        if ((userId == foundMessage.userId || currentUser.isAdmin) && filename !== null) {
-                            fs.unlink(`images-mess/${filename}`, () => {
-                                models.Message.destroy({
-                                    where: { id: req.params.id }
-                                })
-                                    .then(() => res.status(200).json({ message: 'Message Deleted !' }))
-                                    .catch((error) => res.status(400).json({ error }))
-                            })
-                        }
-                        else if ((userId == foundMessage.userId || currentUser.isAdmin) && filename === null) {
-
-                            models.Message.destroy({
-                                where: { id: req.params.id }
-                            })
-                                .then(() => res.status(200).json({ message: 'Message Deleted !' }))
-                                .catch((error) => res.status(400).json({ error }))
-                        }
-                        else {
-                            res.status(401).json({ message: 'You can\'t delete this message!' })
-                        }
-                    })
-            })
-            .catch(error => res.status(404).json({ error }))
+            }
+        }
+        else {
+            res.status(401).json({ message: 'You can\'t delete this message!' })
+        }
     } catch (error) {
         res.status(500).json({ error })
     }
