@@ -1,7 +1,7 @@
 var models = require('../models')
 const fs = require('fs')
 
-const destroyMessage = async function (messageId) {
+const destroyMessage = async function (messageId, res) {
     try {
         await models.Message.destroy({
             where: { id: messageId }
@@ -95,12 +95,10 @@ exports.deleteMessage = async (req, res, next) => {
             null
         if (userId == foundMessage.userId || currentUser.isAdmin) {
             if (filename === null) {
-                destroyMessage(foundMessage.id)
-                res.status(200).json({ message: 'Message Deleted !' })
+                destroyMessage(foundMessage.id, res)
             } else {
                 fs.unlink(`images-mess/${filename}`, async () => {
-                    destroyMessage(foundMessage.id)
-                    res.status(200).json({ message: 'Message Deleted !' })
+                    destroyMessage(foundMessage.id, res)
                 })
             }
         }

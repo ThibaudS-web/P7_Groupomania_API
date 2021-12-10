@@ -4,7 +4,7 @@ var models = require('../models');
 
 var fs = require('fs');
 
-var destroyMessage = function destroyMessage(messageId) {
+var destroyMessage = function destroyMessage(messageId, res) {
   return regeneratorRuntime.async(function destroyMessage$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -150,22 +150,16 @@ exports.deleteMessage = function _callee2(req, res, next) {
 
           if (userId == foundMessage.userId || currentUser.isAdmin) {
             if (filename === null) {
-              destroyMessage(foundMessage.id);
-              res.status(200).json({
-                message: 'Message Deleted !'
-              });
+              destroyMessage(foundMessage.id, res);
             } else {
               fs.unlink("images-mess/".concat(filename), function _callee() {
                 return regeneratorRuntime.async(function _callee$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
                       case 0:
-                        destroyMessage(foundMessage.id);
-                        res.status(200).json({
-                          message: 'Message Deleted !'
-                        });
+                        destroyMessage(foundMessage.id, res);
 
-                      case 2:
+                      case 1:
                       case "end":
                         return _context2.stop();
                     }
