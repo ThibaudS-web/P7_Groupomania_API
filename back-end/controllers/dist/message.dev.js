@@ -101,7 +101,7 @@ exports.deleteMessage = function (req, res, next) {
       }).then(function (foundMessage) {
         var filename = foundMessage.attachment ? foundMessage.attachment.split('/images-mess/')[1] : null;
 
-        if (userId == foundMessage.userId || currentUser.isAdmin && filename !== null) {
+        if ((userId == foundMessage.userId || currentUser.isAdmin) && filename !== null) {
           fs.unlink("images-mess/".concat(filename), function () {
             models.Message.destroy({
               where: {
@@ -117,7 +117,7 @@ exports.deleteMessage = function (req, res, next) {
               });
             });
           });
-        } else if (userId == foundMessage.userId || currentUser.isAdmin && filename === null) {
+        } else if ((userId == foundMessage.userId || currentUser.isAdmin) && filename === null) {
           models.Message.destroy({
             where: {
               id: req.params.id
