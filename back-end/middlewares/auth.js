@@ -5,7 +5,6 @@ const user = require('../models/user')
 
 //Middleware to require user authentication
 function authUser(req, res, next) {
-    console.log('req.body :', req.body)
     try {
         const token = req.headers.authorization.split(' ')[1]
         try {

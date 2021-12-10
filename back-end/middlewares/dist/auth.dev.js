@@ -8,8 +8,6 @@ var user = require('../models/user'); //Middleware to require user authenticatio
 
 
 function authUser(req, res, next) {
-  console.log('req.body :', req.body);
-
   try {
     var token = req.headers.authorization.split(' ')[1];
 
