@@ -1,9 +1,7 @@
-
 const jwt = require('jsonwebtoken')
 var models = require('../models')
 const user = require('../models/user')
 
-//Middleware to require user authentication
 function authUser(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1]

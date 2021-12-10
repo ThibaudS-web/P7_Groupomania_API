@@ -4,8 +4,7 @@ var jwt = require('jsonwebtoken');
 
 var models = require('../models');
 
-var user = require('../models/user'); //Middleware to require user authentication
-
+var user = require('../models/user');
 
 function authUser(req, res, next) {
   try {
