@@ -62,6 +62,8 @@ exports.createMessage = function (req, res, next) {
       include: [{
         model: models.User,
         attributes: ['username', 'picture']
+      }, {
+        model: models.Comment
       }]
     }).then(function (newMessageJoinUser) {
       return res.status(201).json(newMessageJoinUser);

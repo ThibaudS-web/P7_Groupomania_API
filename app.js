@@ -25,7 +25,7 @@ const { sequelize } = require("./models/index");
 (async function () {
     try {
         await db.sequelize.authenticate();
-        db.sequelize.sync({ alter: true }).then(data => { console.log('Sync success!') })
+        db.sequelize.sync().then(data => { console.log('Sync success!') })
             .catch(error => { console.log(error) })
         console.log('Connection has been established successfully');
     } catch (error) {
