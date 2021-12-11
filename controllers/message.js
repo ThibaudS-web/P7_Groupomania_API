@@ -34,10 +34,15 @@ exports.createMessage = (req, res, next) => {
 
     try {
         models.Message.create(newMessage, {
-            include: [{
-                model: models.User,
-                attributes: ['username', 'picture']
-            }]
+            include: [
+                {
+                    model: models.User,
+                    attributes: ['username', 'picture']
+                },
+                {
+                    model: models.Comment
+                },
+            ]
         })
             .then((newMessageJoinUser) => res.status(201).json(newMessageJoinUser))
             .catch((error) => res.status(400).json({ error }))

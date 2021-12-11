@@ -49,7 +49,8 @@ module.exports = function (sequelize, DataTypes) {
           foreignKey: {
             allowNull: false,
             name: 'userId'
-          }
+          },
+          onDelete: "cascade"
         }), models.Message.hasMany(models.Comment, {
           foreignKey: {
             name: 'messageId'

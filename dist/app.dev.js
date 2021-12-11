@@ -48,9 +48,7 @@ var _require2 = require("./models/index"),
           return regeneratorRuntime.awrap(db.sequelize.authenticate());
 
         case 3:
-          db.sequelize.sync({
-            alter: true
-          }).then(function (data) {
+          db.sequelize.sync().then(function (data) {
             console.log('Sync success!');
           })["catch"](function (error) {
             console.log(error);
