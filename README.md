@@ -10,14 +10,20 @@ TOKENPASS=<your token here>
 
 ## Start the API
 
-Install external dependencies :
-
+Install external dependencies:
 ```
 $ npm install
 ```
+Download sequelize-cli :
+```
+$ npm i sequelize-cli
+```
+and create Database in local
+```
+$ sequelize db:create groupomaniaDB_development
+```
 
-Start the server
-
+Start the server:
 ```
 $ nodemon server
 ```

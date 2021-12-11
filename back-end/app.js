@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const express = require('express')
 const bodyParser = require('body-parser')
 const rateLimit = require("express-rate-limit")
-const path = require ('path')
+const path = require('path')
 
 
 //Limit request : 10 per sec
@@ -23,12 +23,15 @@ const comment = require('./models/comment');
 const { sequelize } = require("./models/index");
 
 //Test the connexion at the Database
-try {
-    db.sequelize.authenticate();
-    console.log('Connection has been established successfully');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
-}
+(async function() {
+    try {
+        await db.sequelize.authenticate();
+        console.log('Connection has been established successfully');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+})()
+
 
 
 const app = express()
