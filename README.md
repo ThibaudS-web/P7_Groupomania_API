@@ -7,7 +7,7 @@ git clone https://github.com/ThibaudS-web/P7_saumureau_thibaud.git
 Node: v10.0.0
 Sequelize: v6.2.0
 
-## Add TOKEN
+## Add JWT secret
 
 Create a file .env in the root project. In this file, you need to add the key which will be used in jsonwebtoken generation.
 
