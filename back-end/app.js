@@ -4,7 +4,6 @@ const bodyParser = require('body-parser')
 const rateLimit = require("express-rate-limit")
 const path = require('path')
 
-
 //Limit request : 10 per sec
 const limiter = rateLimit({
     windowMs: 1000,  // 1 second
@@ -23,16 +22,16 @@ const comment = require('./models/comment');
 const { sequelize } = require("./models/index");
 
 //Test the connexion at the Database
-(async function() {
+(async function () {
     try {
         await db.sequelize.authenticate();
+        db.sequelize.sync({ alter: true }).then(data => { console.log('Sync success!') })
+            .catch(error => { console.log(error) })
         console.log('Connection has been established successfully');
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
 })()
-
-
 
 const app = express()
 

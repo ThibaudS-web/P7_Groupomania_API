@@ -48,21 +48,28 @@ var _require2 = require("./models/index"),
           return regeneratorRuntime.awrap(db.sequelize.authenticate());
 
         case 3:
+          db.sequelize.sync({
+            alter: true
+          }).then(function (data) {
+            console.log('Sync success!');
+          })["catch"](function (error) {
+            console.log(error);
+          });
           console.log('Connection has been established successfully');
-          _context.next = 9;
+          _context.next = 10;
           break;
 
-        case 6:
-          _context.prev = 6;
+        case 7:
+          _context.prev = 7;
           _context.t0 = _context["catch"](0);
           console.error('Unable to connect to the database:', _context.t0);
 
-        case 9:
+        case 10:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 6]]);
+  }, null, null, [[0, 7]]);
 })();
 
 var app = express(); //Setup headers
