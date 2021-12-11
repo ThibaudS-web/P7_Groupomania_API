@@ -1,4 +1,4 @@
 node_modules
 .env
-images-prof
-images-mess
+/images-prof
+/images-mess
