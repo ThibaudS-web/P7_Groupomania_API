@@ -1,5 +1,9 @@
 # P7_saumureau_thibaud
 
+## Version used
+Node: v10.0.0
+Sequelize: v6.2.0
+
 ## Add TOKEN
 
 Create a file .env in the root project. In this file, you need to add a variable for your Token variable
@@ -22,6 +26,7 @@ and create Database in local
 ```
 $ sequelize db:create groupomaniaDB_development
 ```
+Don't forget to import the ```groupomaniadb_development.sql``` file for the data DB
 
 Start the server:
 ```
